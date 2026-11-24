@@ -6,7 +6,6 @@ El Instituto Nacional de Salud (INS) vigila el dengue con el **canal endémico**
 
 Este proyecto replica el canal endémico del INS y evalúa si un modelo de la familia **ARIMA** (ARIMA, SARIMA, SARIMAX) puede complementarlo con un pronóstico a 4 semanas.
 
-> **Estado:** los resultados de la comparación de modelos están en revisión con el docente.
 
 ## Integrantes
 
