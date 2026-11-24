@@ -10,8 +10,8 @@ Este proyecto replica el canal endémico del INS y evalúa si un modelo de la fa
 
 ## Integrantes
 
-- [COMPLETAR: nombres del grupo]
-- Docente: [COMPLETAR]
+- Santiago José Cuesta Maza, Diego David Jaraba Padilla, Susana Marcela Rosales Castellar, Jacobo jose simancas Hernández
+- Docente: Fernando Enrique Salcedo Mejia
 
 ## Contenido del repositorio
 
