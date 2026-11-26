@@ -1,78 +1,88 @@
-# Del dato a la alerta: canal endémico y modelos ARIMA para el dengue en Colombia
+# Del dato a la alerta: pronóstico del dengue en Colombia con modelos ARIMA
 
-Proyecto final de Series de Tiempo · Semillero de Machine Learning (feria científica).
+Pronóstico de los casos semanales de dengue en Colombia (2007–2025) con modelos de la familia ARIMA. El proyecto compara un modelo ingenuo, un ARIMA y varios SARIMAX (regresión con errores ARIMA) que incluyen el índice ONI de El Niño y el clima local. Además modela la varianza de los errores con un GARCH(1,1).
 
-El Instituto Nacional de Salud (INS) vigila el dengue con el **canal endémico**: una banda calculada con los casos de años anteriores que indica si los casos de cada semana son normales, están en alerta o en brote. El canal dice *cómo estamos*, pero no *cuántos casos vienen*.
+**Pregunta de pronóstico:** ¿cuántos casos de dengue se notificarán en Colombia en cada una de las próximas 4 semanas epidemiológicas? ¿Mejora ese pronóstico al incluir el fenómeno de El Niño y el clima local?
 
-Este proyecto replica el canal endémico del INS y evalúa si un modelo de la familia **ARIMA** (ARIMA, SARIMA, SARIMAX) puede complementarlo con un pronóstico a 4 semanas.
+## Autores
 
+- Jacobo Simancas Hernandez — Ciencia de Datos
+- Santiago Cuesta Maza — Ciencia de Datos e Ingeniería de Sistemas
+- Susana Rosales Castellar — Ciencia de Datos e Ingeniería de Sistemas
+- Diego Jaraba Padilla — Ciencia de Datos e Ingeniería de Sistemas
 
-## Integrantes
-
-- Santiago José Cuesta Maza, Diego David Jaraba Padilla, Susana Marcela Rosales Castellar, Jacobo jose simancas Hernández
-- Docente: Fernando Enrique Salcedo Mejia
+Proyecto final de Series de Tiempo · Semillero de Machine Learning.
 
 ## Contenido del repositorio
 
-| Archivo | Qué es |
+| Archivo o carpeta | Descripción |
 | :--- | :--- |
-| `Canal_endemico_y_ARIMA_dengue_proyecto_final.ipynb` | Cuaderno con todo el análisis, ya ejecutado (se ven tablas y gráficas sin correrlo) |
-| `dengue_semanal_2019_2025.csv` | Casos semanales de dengue en Colombia, 2019–2025 (366 semanas) |
-| `canal_ins_figura16_digitalizado.csv` | Valores del canal endémico del INS, leídos de la Figura 16 del boletín |
-| `requirements.txt` | Paquetes de Python que usa el cuaderno |
+| `DENGUE_FINAL.ipynb` | Cuaderno con todo el análisis, ejecutado y con sus resultados |
+| `DENGUE_FINAL.html` | El mismo cuaderno en HTML, para verlo en el navegador sin ejecutar nada |
+| `figuras/` | Gráficas principales que genera el cuaderno |
+| `data/` | Carpeta vacía donde van los datos (**no se incluyen**; ver abajo) |
+| `requirements.txt` | Librerías de Python necesarias |
 
-## Datos
+## Datos (no incluidos)
 
-- **Fuente:** microdatos del Sivigila, Instituto Nacional de Salud (INS). https://portalsivigila.ins.gov.co/
-- **Eventos:** 210 (dengue), 220 (dengue grave) y 580 (mortalidad por dengue), los mismos que suma el boletín del INS.
-- **Serie:** casos notificados por semana epidemiológica, nivel nacional, de 2019-SE01 a 2025-SE53.
-- **Fecha de descarga:** [COMPLETAR]
-- **Canal de referencia:** Boletín Epidemiológico Semanal del INS, semana 38 de 2026 (Figura 16, página 31).
+Los datos **no se suben a este repositorio**. Para ejecutar el cuaderno hay que conseguirlos y ponerlos en la carpeta `data/` con estos nombres:
 
-Los archivos originales del Sivigila (un registro por paciente) **no se incluyen** en el repositorio: son muy pesados (el de 2024 pasa de 200 MB) y no hacen falta para correr el cuaderno. `dengue_semanal_2019_2025.csv` solo tiene el conteo de casos por semana y no contiene datos de pacientes.
+| Archivo | Contenido | Cómo obtenerlo |
+| :--- | :--- | :--- |
+| `dengue_semanal_2007_2025.csv` | Casos semanales de dengue en Colombia, 2007-SE01 a 2025-SE53 | **Se deben solicitar al Sivigila** (Sistema Nacional de Vigilancia en Salud Pública, Instituto Nacional de Salud) |
+| `oni_cpc_v6_2005_2025.csv` | Índice ONI de El Niño, 2005–2025 | Público: NOAA Climate Prediction Center |
+| `clima_nasa_power_7_ciudades_2006_2025.csv` | Temperatura, humedad y precipitación diarias de 7 ciudades, 2006–2025 | Público: NASA POWER |
 
-## Cómo ejecutar el cuaderno
+**Serie de casos de dengue.** La serie es la **suma de los tres eventos de dengue del Sivigila** por semana epidemiológica, de **2007 a 2025**:
 
-**En Google Colab (recomendado)**
+- **210:** dengue
+- **220:** dengue grave
+- **580:** mortalidad por dengue
 
-1. Abrir el archivo `.ipynb` en [Google Colab](https://colab.research.google.com/) (Archivo → Subir cuaderno).
-2. Subir los dos archivos `.csv` a la carpeta `/content` (ícono de carpeta, a la izquierda).
-3. Entorno de ejecución → Ejecutar todas. Tarda entre 6 y 8 minutos.
+`data/README.md` explica el formato exacto de cada archivo (columnas y ejemplos).
 
-**En el computador**
+## Cómo ejecutarlo
+
+**En Google Colab**
+
+1. Abre `DENGUE_FINAL.ipynb` en Colab.
+2. En el panel de archivos crea la carpeta `data` y sube ahí los tres CSV.
+3. Ejecuta todas las celdas (*Entorno de ejecución → Ejecutar todas*). La primera celda instala `pmdarima` y `arch`.
+
+**En tu computador**
 
 ```bash
 pip install -r requirements.txt
-jupyter notebook
+jupyter notebook DENGUE_FINAL.ipynb
 ```
 
-El cuaderno y los dos `.csv` deben estar en la misma carpeta.
+La ejecución completa tarda entre 20 y 25 minutos, casi todo en la evaluación de la sección 5.2: 10 años de prueba, 2 horizontes y 7 modelos.
 
-## Método
+## Método, en resumen
 
-1. **Canal endémico (referencia institucional):** método de las medias geométricas de Bortman, validado contra la Figura 16 del boletín.
-2. **Modelos de referencia:** ingenuo, ingenuo estacional e ingenuo con deriva.
-3. **Modelos candidatos:** ARIMA, SARIMA (s = 52) y SARIMAX con términos de Fourier.
-4. **Evaluación:** RMSE, MAE, MAPE y MASE en el periodo de prueba (2025), a 4 semanas (horizonte principal), 1 semana y año completo. Se repite con los años de prueba 2022 a 2025.
-5. **Producto final:** pronóstico de 2026-SE01 a 2026-SE04, con intervalos del 80 % y del 95 %, ubicado sobre el canal endémico de 2026.
+1. **Análisis exploratorio:**
+   - series de casos, ONI y clima;
+   - descomposición STL;
+   - correlación con el ONI rezagado;
+   - estacionariedad con ADF y KPSS, y gráficos ACF y PACF.
+2. **Modelos:**
+   - **M0:** ingenuo, equivalente a un ARIMA(0,1,0).
+   - **ARIMA:** elegido con `auto_arima`.
+   - **M1 a M5:** SARIMAX con ONI, temperatura, humedad y precipitación. Los rezagos de cada variable se eligen por AICc.
+3. **Evaluación fuera de la muestra:**
+   - pronóstico con origen móvil a 4 y 12 semanas en 10 años de prueba (2016–2025);
+   - RMSE, MAE y prueba de Diebold-Mariano (con la corrección de Harvey, Leybourne y Newbold) frente al ingenuo.
+4. **Diagnóstico de residuos:** Ljung-Box, Jarque-Bera, Shapiro-Wilk y ARCH-LM.
+5. **Volatilidad:** GARCH(1,1) sobre los residuos del modelo final, para corregir los intervalos de pronóstico.
+6. **Pronóstico** de 2026-SE01 a 2026-SE04, con intervalos del 80 % y del 95 %.
 
-## Resultados principales
+## Resultado principal
 
-- La réplica del canal endémico coincide con la del boletín del INS con diferencias menores al 1 %.
-- A 1 y 4 semanas, los modelos que usan los casos más recientes anticipan mejor que suponer "lo normal" (el valor esperado del canal).
-- El canal y el modelo de pronóstico responden preguntas distintas y se complementan: el canal clasifica la situación actual y el modelo anticipa las próximas semanas.
+- **El mejor modelo es M5,** un SARIMAX con ONI, temperatura, humedad y precipitación. Tiene el menor RMSE a 4 semanas en los 10 años de prueba (394.0 frente a 436.5 del ingenuo) y supera al ingenuo de forma significativa (Diebold-Mariano = −2.07, p = 0.039).
+- **El ONI es la variable que aporta,** con un rezago de 17 semanas. El clima local casi no suma información una vez que el ONI está en el modelo.
 
-El detalle de la comparación entre modelos está en la sección 5 del cuaderno.
+## Fuentes
 
-## Limitaciones
-
-- Un solo periodo (2019–2025) con una sola gran epidemia completa (2024).
-- Los residuos de los modelos no son ruido blanco.
-- No se usan variables climáticas.
-- Los datos del portal están depurados; el boletín trabaja con cifras preliminares.
-
-## Referencias
-
-- Instituto Nacional de Salud. *Boletín Epidemiológico Semanal, semana 38 de 2026.*
-- Bortman, M. (1999). Elaboración de corredores o canales endémicos mediante planillas de cálculo. *Revista Panamericana de Salud Pública*, 5(1).
-- Las demás fuentes están citadas en la sección 3.2 del cuaderno.
+- Instituto Nacional de Salud. Sivigila, Sistema Nacional de Vigilancia en Salud Pública. https://portalsivigila.ins.gov.co/
+- NOAA Climate Prediction Center. Oceanic Niño Index (ONI), versión 6. https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/oni/v6/index.php
+- NASA Langley Research Center. POWER Project. https://power.larc.nasa.gov/
